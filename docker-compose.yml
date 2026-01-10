@@ -1,0 +1,25 @@
+services:
+  pdf2html-api:
+    image: 你的用户名/pdf2html-api:latest  # 替换为你的 Docker Hub 用户名
+    # build: .  # 本地构建时取消注释
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - pdf_temp:/tmp/pdf2html  # 临时文件存储
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  pdf_temp:
