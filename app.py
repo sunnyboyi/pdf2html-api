@@ -176,5 +176,41 @@ def convert_pdf_to_html_full():
     )
 
 
+@app.route('/convert/text', methods=['POST'])
+def convert_pdf_to_html_text():
+    """转换 PDF 到 HTML，返回 JSON 格式的字符串内容（清理版）"""
+    file, error = validate_file(request)
+    if error:
+        return jsonify(error[0]), error[1]
+    
+    html_content, error, status = do_convert(file, clean=True)
+    
+    if error:
+        return jsonify(error), status
+    
+    return jsonify({
+        'filename': os.path.splitext(file.filename)[0] + '.html',
+        'html': html_content
+    })
+
+
+@app.route('/convert/text/full', methods=['POST'])
+def convert_pdf_to_html_text_full():
+    """转换 PDF 到 HTML，返回 JSON 格式的字符串内容（完整版）"""
+    file, error = validate_file(request)
+    if error:
+        return jsonify(error[0]), error[1]
+    
+    html_content, error, status = do_convert(file, clean=False)
+    
+    if error:
+        return jsonify(error), status
+    
+    return jsonify({
+        'filename': os.path.splitext(file.filename)[0] + '.html',
+        'html': html_content
+    })
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
