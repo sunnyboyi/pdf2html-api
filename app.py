@@ -62,6 +62,40 @@ def clean_head(html_content):
     return html_content
 
 
+def clean_span_tags(html_content):
+    """移除 HTML 中的所有 span 标签（保留标签内的内容）"""
+    html_content = re.sub(r'<span[^>]*>', '', html_content, flags=re.IGNORECASE)
+    html_content = re.sub(r'</span>', '', html_content, flags=re.IGNORECASE)
+    return html_content
+
+
+def clean_attributes(html_content):
+    """移除标签中的无用属性（style, id, data-*, class 等）"""
+    # 移除 style 属性
+    html_content = re.sub(r'\s+style\s*=\s*["\'][^"\']*["\']', '', html_content, flags=re.IGNORECASE)
+    # 移除 id 属性
+    html_content = re.sub(r'\s+id\s*=\s*["\'][^"\']*["\']', '', html_content, flags=re.IGNORECASE)
+    # 移除 class 属性
+    html_content = re.sub(r'\s+class\s*=\s*["\'][^"\']*["\']', '', html_content, flags=re.IGNORECASE)
+    # 移除 data-* 属性（分别处理单引号和双引号）
+    html_content = re.sub(r"\s+data-[a-z0-9-]+\s*=\s*'[^']*'", '', html_content, flags=re.IGNORECASE)
+    html_content = re.sub(r'\s+data-[a-z0-9-]+\s*=\s*"[^"]*"', '', html_content, flags=re.IGNORECASE)
+    return html_content
+
+
+def clean_extra(html_content):
+    """移除 HTML 注释和 URL 地址"""
+    # 移除 HTML 注释
+    html_content = re.sub(r'<!--.*?-->', '', html_content, flags=re.DOTALL)
+    # 移除 URL 地址（http/https/ftp）
+    html_content = re.sub(r'https?://[^\s<>"\']+', '', html_content, flags=re.IGNORECASE)
+    html_content = re.sub(r'ftp://[^\s<>"\']+', '', html_content, flags=re.IGNORECASE)
+    # 移除 href 和 src 属性中的链接
+    html_content = re.sub(r'\s+href\s*=\s*["\'][^"\']*["\']', '', html_content, flags=re.IGNORECASE)
+    html_content = re.sub(r'\s+src\s*=\s*["\'][^"\']*["\']', '', html_content, flags=re.IGNORECASE)
+    return html_content
+
+
 def do_convert(file, clean=True):
     """执行 PDF 转 HTML 转换"""
     # 创建唯一工作目录
@@ -98,6 +132,9 @@ def do_convert(file, clean=True):
         if clean:
             html_content = clean_image_nodes(html_content)
             html_content = clean_head(html_content)
+            html_content = clean_span_tags(html_content)
+            html_content = clean_attributes(html_content)
+            html_content = clean_extra(html_content)
         
         # 立即清理工作目录
         shutil.rmtree(work_dir, ignore_errors=True)
