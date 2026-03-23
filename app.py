@@ -111,11 +111,17 @@ def do_convert(file, clean=True):
         # 调用 pdf2htmlEX 转换
         output_html = os.path.join(work_dir, 'output.html')
         result = subprocess.run(
-            ['pdf2htmlEX', '--zoom', '1.3', '--dest-dir', work_dir, 
-             '--process-outline', '0', pdf_path, 'output.html'],
-            capture_output=True,
-            text=True,
-            timeout=300
+            [
+                'pdf2htmlEX',
+                '--zoom', '1.3',              # 缩放比例 1.3 倍
+                '--dest-dir', work_dir,       # 输出目录
+                '--process-outline', '0',     # 不处理 PDF 大纲/书签
+                pdf_path,                     # 输入 PDF 文件路径
+                'output.html'                 # 输出 HTML 文件名
+            ],
+            capture_output=True,              # 捕获标准输出和错误输出
+            text=True,                        # 以文本模式返回输出
+            timeout=300                       # 超时时间 300 秒
         )
         
         if result.returncode != 0:
